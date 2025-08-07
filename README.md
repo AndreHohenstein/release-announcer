@@ -1,89 +1,65 @@
-# 📢 Release Announcer – GitHub Releases → X (Twitter) Auto-Poster
+# 🚀 Release Announcer
 
-> **Version:** 1.0 – 2025-08-07  
-
----
-
-## 🎯 Ziel
-Dieses Projekt überwacht **alle Repositories** eines GitHub-Users (und optional Organisationen) und postet automatisch einen Tweet auf **X (Twitter)**, sobald ein neues Release erscheint.  
-Die Lösung ist **zentral** – es muss **nichts** in den Quell-Repos geändert werden.
+Automatisierter GitHub → X (Twitter) Release-Poster.  
+Dieses Projekt überwacht neue Releases in einem GitHub-Account oder einer Organisation und postet diese automatisch zu **X** – wahlweise im **Debug-/Testmodus**.
 
 ---
 
-## 📂 Projektstruktur
-```
-.github/
-└─ workflows/
-   └─ announce-on-x.yml   # GitHub Actions Workflow
-src/
-├─ scan_releases.py       # Scannt Repos und erkennt neue Releases
-└─ post_to_x.py           # Postet Release-Infos auf X
-state/
-├─ known_releases.json    # Bereits gepostete Releases (ID-Tracking)
-└─ pending.json           # Noch nicht gepostete Releases
-requirements.txt          # Python-Abhängigkeiten
-README.md                 # Diese Datei
-CHANGELOG.md              # Änderungsprotokoll
-```
+## 📦 Version
+**0.9.9 (Unreleased)**
 
 ---
 
-## 🛠 Voraussetzungen
-- GitHub-Repo (dieses) – **privat** oder **öffentlich**  
-- GitHub Actions aktiviert  
-- Python 3.12 (nur nötig, wenn lokal getestet wird)  
-- Account bei [developer.x.com](https://developer.x.com) für API-Keys  
+## ✨ Features
+- Überwacht alle Repos eines Accounts oder einer Organisation
+- Erkennt neue Releases über die GitHub API
+- Postet automatisch einen Ankündigungstext zu X (Twitter)
+- **Debug-/Testmodus** zum gefahrlosen Testen ohne Live-Posting
+- GitHub Actions Workflow inklusive
 
 ---
 
-## 🔐 Benötigte Repository Settings
+## 🧪 Sicher testen (Debug-Modus)
+Um sicherzustellen, dass beim Testen **keine Live-Posts an X gesendet werden**, kann der Debugmodus aktiviert werden:
 
-### **Secrets**  
-*(Settings → Secrets and variables → Actions → New repository secret)*  
-| Name | Beschreibung |
-|------|--------------|
-| `GH_PAT` | GitHub Personal Access Token (read-only) |
-| `X_API_KEY` | API Key von developer.x.com |
-| `X_API_SECRET` | API Secret |
-| `X_ACCESS_TOKEN` | Access Token |
-| `X_ACCESS_TOKEN_SECRET` | Access Token Secret |
+1. Öffne im Repo **Settings → Secrets and variables → Actions → New repository secret**
+2. Erstelle ein Secret:
+   - **Name:** `DEBUG_MODE`  
+   - **Value:** `true` (klein geschrieben, ohne Anführungszeichen)
+3. Speichern.
 
-### **Variables**  
-*(Settings → Secrets and variables → Actions → Variables)*  
-| Name | Beispielwert | Beschreibung |
-|------|--------------|--------------|
-| `GH_USER` | `andrehohenstein` | Dein GitHub-Username |
-| `ORGS_CSV` | `Org1,Org2` *(optional)* | Organisationen, die mitgescannt werden |
+🔹 **Deaktivieren**: Secret `DEBUG_MODE` löschen oder Wert auf `false` setzen.
 
 ---
 
-## ⚙️ Verwendung
-
-### **Manuell starten**
-1. GitHub → Actions → „Announce new releases on X“ auswählen  
-2. **Run workflow** klicken  
-
-### **Automatisch**
-- Der Workflow läuft alle **10 Minuten** und prüft auf neue Releases.  
-- Bei neuen Releases werden Tweets automatisch gepostet.  
+## ⚙️ Voraussetzungen
+- Python 3.8+ installiert
+- GitHub Personal Access Token (nur Lesezugriff erforderlich)
+- X (Twitter) API Key & Access Token
 
 ---
 
-## 📝 Best Practices & Sicherheit
-- **Keine API-Keys im Code hinterlegen** – nur als GitHub Secrets speichern.  
-- **Least Privilege**: PAT nur mit `repo:read` (und `read:org`, falls nötig).  
-- **Rotation**: Keys regelmäßig erneuern.  
-- **Logs prüfen**: Sicherstellen, dass keine geheimen Daten ausgegeben werden.  
+## 🔑 Benötigte GitHub Secrets
+| Name              | Beschreibung |
+|-------------------|--------------|
+| `GH_TOKEN`        | GitHub Personal Access Token (Repo Read) |
+| `X_API_KEY`       | API Key von X (Twitter Developer Portal) |
+| `X_API_SECRET`    | API Secret von X |
+| `X_ACCESS_TOKEN`  | Access Token von X |
+| `X_ACCESS_SECRET` | Access Secret von X |
+| `DEBUG_MODE`      | `true` = Testmodus, `false` = Live-Posting |
 
 ---
 
-## 📜 Changelog
-> Änderungen am Projekt werden hier dokumentiert.  
-> Vollständige Übersicht: [CHANGELOG.md](CHANGELOG.md)
+## 📜 Lizenz
+Dieses Projekt steht unter der [MIT-Lizenz](./LICENSE.md).  
+Frei verwendbar – auch für eigene Projekte & Schulungsunterlagen.
 
-```
-2025-08-07 – Initial Commit: Release-Scanner + X-Poster
-```
 ---
 
-© 2025 André Hohenstein – Microsoft Certified Trainer 💻
+## 🧾 Changelog
+Alle Änderungen werden im [CHANGELOG.md](./CHANGELOG.md) dokumentiert.
+
+---
+
+© 2025 André Hohenstein – Microsoft Certified Trainer
