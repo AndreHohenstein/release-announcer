@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pdb
+*.pkl
+*.log
+
+# Virtual Environments
+.venv/
+env/
+venv/
+ENV/
+
+# VS Code
+.vscode/
+.history/
+
+# System
+.DS_Store
+Thumbs.db
+
+# Python packaging
+build/
+dist/
+*.egg-info/
+
+# State files (optional, wenn nicht im Repo gewünscht)
+# state/known_releases.json
+# state/pending.json

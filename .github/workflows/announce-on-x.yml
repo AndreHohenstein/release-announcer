@@ -1,0 +1,72 @@
+name: Announce new releases on X
+
+on:
+  workflow_dispatch: {}   # Manuell starten
+  schedule:
+    - cron: "*/10 * * * *"  # Alle 10 Minuten automatisch starten
+
+permissions:
+  contents: write   # Damit wir state/known_releases.json updaten können
+
+jobs:
+  announce:
+    runs-on: ubuntu-latest   # Läuft auf GitHub Actions Ubuntu Server
+    steps:
+      # 1. Code aus deinem Repo holen
+      - uses: actions/checkout@v4
+
+      # 2. Python-Umgebung einrichten
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # 3. Abhängigkeiten installieren (tweepy, requests, etc.)
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # 4. Releases scannen
+      - name: Scan GitHub for new releases
+        id: scan
+        env:
+          GH_USER: ${{ vars.GH_USER }}
+          ORGS_CSV: ${{ vars.ORGS_CSV }}
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: |
+          python src/scan_releases.py
+
+      # 5. Neue Releases auf X posten
+      - name: Post announcements to X
+        if: steps.scan.outputs.has_new == '1'
+        env:
+          X_API_KEY: ${{ secrets.X_API_KEY }}
+          X_API_SECRET: ${{ secrets.X_API_SECRET }}
+          X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
+          X_ACCESS_TOKEN_SECRET: ${{ secrets.X_ACCESS_TOKEN_SECRET }}
+        run: |
+          if [ -s state/pending.json ]; then
+            for i in $(jq -r 'to_entries[] | .key' state/pending.json); do
+              BODY=$(jq -r ".[$i].body" state/pending.json)
+              URL=$(jq -r ".[$i].url" state/pending.json)
+              echo "Posting: $BODY"
+              RELEASE_BODY="$BODY" RELEASE_URL="$URL" python src/post_to_x.py
+            done
+            echo "[]" > state/pending.json
+          else
+            echo "No pending items."
+          fi
+
+      # 6. State-Dateien committen, damit wir wissen, was schon gepostet wurde
+      - name: Persist state
+        run: |
+          if git diff --quiet -- state/known_releases.json state/pending.json; then
+            echo "No state changes."
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add state/known_releases.json state/pending.json
+            git commit -m "chore(state): update known/pending releases [skip ci]"
+            git push
+          fi
