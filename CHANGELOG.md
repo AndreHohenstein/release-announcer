@@ -1,15 +1,20 @@
 # 📜 Changelog – Release Announcer
 
 Alle relevanten Änderungen an diesem Projekt werden hier dokumentiert.  
-Format: `YYYY-MM-DD – Kurzbeschreibung`
 
 ---
 
-## [Unreleased]
-### Geplant / In Arbeit
+## [1.0.0] – 2025-08-08
+### Added
+- Erste stabile Version – **Production Ready**
 - Dokumentation des **Debug-/Testmodus** (`DEBUG_MODE` Secret) in README
-- Hinweis zum Umschalten zwischen Test und Live
-- Erste stabile Version **0.9.9** vorbereiten (inkl. finalem Workflow-Test)
+- Hinweis zum Umschalten zwischen Test- und Produktivmodus
+- Vollständige Anleitung zur Einrichtung der GitHub Secrets für X
+- Workflow final getestet (Debug- und Livebetrieb)
+
+### Changed
+- README angepasst, Pre-Release-Hinweis entfernt
+- CHANGELOG für v1.0.0 ergänzt
 
 ---
 

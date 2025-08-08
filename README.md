@@ -1,65 +1,54 @@
-# 🚀 Release Announcer
+# 🚀 Release Announcer – GitHub → X (Twitter)
 
-Automatisierter GitHub → X (Twitter) Release-Poster.  
-Dieses Projekt überwacht neue Releases in einem GitHub-Account oder einer Organisation und postet diese automatisch zu **X** – wahlweise im **Debug-/Testmodus**.
+[![Workflow Status](https://github.com/AndreHohenstein/release-announcer/actions/workflows/announce-on-x.yml/badge.svg)](https://github.com/AndreHohenstein/release-announcer/actions/workflows/announce-on-x.yml)
+[![Latest Release](https://img.shields.io/github/v/release/AndreHohenstein/release-announcer?label=Release)](https://github.com/AndreHohenstein/release-announcer/releases)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](./LICENSE.md)
 
----
-
-## 📦 Version
-**0.9.9 (Unreleased)**
+Automatisiertes Posten von GitHub-Releases auf **X (Twitter)** – wahlweise im **Debug-/Testmodus** oder direkt im **Produktivmodus**.
 
 ---
 
-## ✨ Features
-- Überwacht alle Repos eines Accounts oder einer Organisation
-- Erkennt neue Releases über die GitHub API
-- Postet automatisch einen Ankündigungstext zu X (Twitter)
-- **Debug-/Testmodus** zum gefahrlosen Testen ohne Live-Posting
-- GitHub Actions Workflow inklusive
+## 📸 Screenshot (Debug-Modus)
+
+![Debug Example](./assets/screenshot_debug_example.png)
 
 ---
 
-## 🧪 Sicher testen (Debug-Modus)
-Um sicherzustellen, dass beim Testen **keine Live-Posts an X gesendet werden**, kann der Debugmodus aktiviert werden:
+## 📖 Überblick
 
-1. Öffne im Repo **Settings → Secrets and variables → Actions → New repository secret**
-2. Erstelle ein Secret:
-   - **Name:** `DEBUG_MODE`  
-   - **Value:** `true` (klein geschrieben, ohne Anführungszeichen)
-3. Speichern.
-
-🔹 **Deaktivieren**: Secret `DEBUG_MODE` löschen oder Wert auf `false` setzen.
+Dieses Projekt durchsucht automatisch ein angegebenes Repository nach neuen **Releases** und postet deren Ankündigung auf **X**.
+Dank des integrierten **Debugmodus** kannst du gefahrlos testen, ohne dass reale Posts abgesetzt werden.
 
 ---
 
-## ⚙️ Voraussetzungen
-- Python 3.8+ installiert
-- GitHub Personal Access Token (nur Lesezugriff erforderlich)
-- X (Twitter) API Key & Access Token
+## ⚙️ Funktionsweise
+
+1. **scan\_release.py** prüft GitHub-Releases des Ziel-Repositories
+2. **post\_to\_x.py** sendet (oder simuliert bei Debug) den Post
+3. **GitHub Actions Workflow** `announce-on-x.yml` steuert den Ablauf
 
 ---
 
-## 🔑 Benötigte GitHub Secrets
-| Name              | Beschreibung |
-|-------------------|--------------|
-| `GH_TOKEN`        | GitHub Personal Access Token (Repo Read) |
-| `X_API_KEY`       | API Key von X (Twitter Developer Portal) |
-| `X_API_SECRET`    | API Secret von X |
-| `X_ACCESS_TOKEN`  | Access Token von X |
-| `X_ACCESS_SECRET` | Access Secret von X |
-| `DEBUG_MODE`      | `true` = Testmodus, `false` = Live-Posting |
+## 🛠 Konfiguration
+
+Siehe [USAGE\_GUIDE.md](./USAGE_GUIDE.md) für eine vollständige Anleitung zur Einrichtung
+und zum Umschalten zwischen **Debug** (`DEBUG_MODE=true`) und **Produktivmodus** (`DEBUG_MODE=false`).
 
 ---
 
-## 📜 Lizenz
-Dieses Projekt steht unter der [MIT-Lizenz](./LICENSE.md).  
-Frei verwendbar – auch für eigene Projekte & Schulungsunterlagen.
+## 📜 Changelog
+
+Alle Änderungen findest du in der [CHANGELOG.md](./CHANGELOG.md).
 
 ---
 
-## 🧾 Changelog
-Alle Änderungen werden im [CHANGELOG.md](./CHANGELOG.md) dokumentiert.
+## 📄 Lizenz
+
+Dieses Projekt steht unter der [MIT-Lizenz](./LICENSE.md).
+Frei verwendbar – Änderungen und Pull Requests willkommen.
 
 ---
 
-© 2025 André Hohenstein – Microsoft Certified Trainer
+## ✍️ Autor
+
+**© 2025 André Hohenstein – Microsoft Certified Trainer**
