@@ -1,4 +1,4 @@
-name: Announce GitHub Release on X
+name: Announce GitHub Release on X (Debug-aware)
 
 on:
   workflow_dispatch:
@@ -10,47 +10,36 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Repo auschecken
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2️⃣ Python einrichten
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.x'
 
-      # 3️⃣ Abhängigkeiten installieren
       - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+        run: pip install -r requirements.txt
 
-      # 4️⃣ Nach neuem Release suchen
-      - name: Scan for new release info
+      - name: Scan GitHub releases
         run: python src/scan_release.py
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GH_USER: ${{ secrets.GH_USER }}
+          GH_PAT: ${{ secrets.GH_PAT }}
 
-      # 5️⃣ Posten oder Debug-Ausgabe
       - name: Post announcements to X
-        if: ${{ hashFiles('state/pending.json') != '' }}
+        if: success()
         run: |
-          if [ -s state/pending.json ] && [ "$(jq length state/pending.json)" -gt 0 ]; then
-            for i in $(jq -r 'range(length)' state/pending.json); do
+          if [ -s state/pending.json ]; then
+            for i in $(jq -r 'to_entries[] | .key' state/pending.json); do
               BODY=$(jq -r ".[$i].body" state/pending.json)
               URL=$(jq -r ".[$i].url" state/pending.json)
-
-              if [ "$DEBUG_MODE" = "true" ]; then
-                echo "🛠 Debug mode active – would post: $BODY ($URL)"
-              else
-                echo "📢 Posting: $BODY"
-                RELEASE_BODY="$BODY" RELEASE_URL="$URL" python src/post_to_x.py
-              fi
+              echo "📢 Posting (debug-aware): $BODY"
+              RELEASE_BODY="$BODY" RELEASE_URL="$URL" python src/post_to_x.py
             done
             echo "[]" > state/pending.json
           else
-            echo "ℹ️ No pending releases found – skipping post step."
+            echo "No pending items."
           fi
         env:
           DEBUG_MODE: ${{ secrets.DEBUG_MODE }}
