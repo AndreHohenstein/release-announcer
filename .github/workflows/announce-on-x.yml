@@ -1,6 +1,7 @@
 name: Announce GitHub Release on X
 
 on:
+  workflow_dispatch:
   release:
     types: [published]
 
@@ -9,45 +10,51 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1️⃣ Repo auschecken
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # 2️⃣ Python einrichten
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.x"
+          python-version: '3.x'
 
+      # 3️⃣ Abhängigkeiten installieren
       - name: Install dependencies
-        run: pip install tweepy jq
-
-      - name: Scan for new release info
-        id: scan
         run: |
-          echo "🔍 Scanning release data..."
-          echo "has_new=1" >> $GITHUB_OUTPUT
-          # Release-Daten aus GitHub-Event ziehen
-          BODY=$(jq -r '.release.body' "$GITHUB_EVENT_PATH")
-          URL=$(jq -r '.release.html_url' "$GITHUB_EVENT_PATH")
-          mkdir -p state
-          echo "{\"0\":{\"body\":\"$BODY\",\"url\":\"$URL\"}}" > state/pending.json
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
-      - name: Post announcements to X
-        if: steps.scan.outputs.has_new == '1'
+      # 4️⃣ Nach neuem Release suchen
+      - name: Scan for new release info
+        run: python src/scan_release.py
         env:
-          DEBUG_MODE: ${{ secrets.DEBUG_MODE }}               # 🔹 Neu für Testmodus
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+      # 5️⃣ Posten oder Debug-Ausgabe
+      - name: Post announcements to X
+        if: ${{ hashFiles('state/pending.json') != '' }}
+        run: |
+          if [ -s state/pending.json ] && [ "$(jq length state/pending.json)" -gt 0 ]; then
+            for i in $(jq -r 'range(length)' state/pending.json); do
+              BODY=$(jq -r ".[$i].body" state/pending.json)
+              URL=$(jq -r ".[$i].url" state/pending.json)
+
+              if [ "$DEBUG_MODE" = "true" ]; then
+                echo "🛠 Debug mode active – would post: $BODY ($URL)"
+              else
+                echo "📢 Posting: $BODY"
+                RELEASE_BODY="$BODY" RELEASE_URL="$URL" python src/post_to_x.py
+              fi
+            done
+            echo "[]" > state/pending.json
+          else
+            echo "ℹ️ No pending releases found – skipping post step."
+          fi
+        env:
+          DEBUG_MODE: ${{ secrets.DEBUG_MODE }}
           X_API_KEY: ${{ secrets.X_API_KEY }}
           X_API_SECRET: ${{ secrets.X_API_SECRET }}
           X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
           X_ACCESS_TOKEN_SECRET: ${{ secrets.X_ACCESS_TOKEN_SECRET }}
-        run: |
-          if [ -s state/pending.json ]; then
-            for i in $(jq -r 'to_entries[] | .key' state/pending.json); do
-              BODY=$(jq -r ".[$i].body" state/pending.json)
-              URL=$(jq -r ".[$i].url" state/pending.json)
-              echo "📢 Posting (debug-aware): $BODY"
-              RELEASE_BODY="$BODY" RELEASE_URL="$URL" python src/post_to_x.py
-            done
-            echo "[]" > state/pending.json
-          else
-            echo "No pending items."
-          fi
